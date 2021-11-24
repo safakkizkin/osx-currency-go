@@ -45,7 +45,7 @@ func getCurrenciesInfo() {
 		}
 
 		sb := string(body)
-		var currency models.Currency
+		var currency models.CurrencyDto
 		err = json.Unmarshal([]byte(sb), &currency)
 		if err != nil {
 			log.Fatalln(err.Error())
@@ -64,6 +64,33 @@ func getCurrenciesInfo() {
 			})
 		}
 	}
+}
+
+var currencies = []menuet.MenuItem{
+	menuet.MenuItem{
+		Text: "10 secs",
+		Clicked: func() {
+			setInterval(models.TenSeconds)
+		},
+	},
+	menuet.MenuItem{
+		Text: "30 secs",
+		Clicked: func() {
+			setInterval(models.ThirtySeconds)
+		},
+	},
+	menuet.MenuItem{
+		Text: "1 min",
+		Clicked: func() {
+			setInterval(models.AMinute)
+		},
+	},
+	menuet.MenuItem{
+		Text: "10 minutes",
+		Clicked: func() {
+			setInterval(models.TenMinutes)
+		},
+	},
 }
 
 var intervals = []menuet.MenuItem{
@@ -93,6 +120,10 @@ var intervals = []menuet.MenuItem{
 	},
 }
 
+func getCurrencies() []menuet.MenuItem {
+	return currencies
+}
+
 func getIntervals() []menuet.MenuItem {
 	return intervals
 }
@@ -107,10 +138,10 @@ func menuItems() []menuet.MenuItem {
 			Text:     "Interval",
 			Children: getIntervals,
 		},
-		//menuet.MenuItem{
-		//	Text:     "Currency",
-		//	Children: currencies,
-		//},
+		menuet.MenuItem{
+			Text:     "Currency",
+			Children: getCurrencies,
+		},
 	}
 }
 
