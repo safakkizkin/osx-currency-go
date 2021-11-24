@@ -3,26 +3,44 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/caseymrm/menuet"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"osx-currency-go/models"
 	"time"
-
-	"github.com/caseymrm/menuet"
 )
 
-func helloClock() {
-	oldValue := 0.0
+func getCurrenciesInfo() {
+	_oldValue := 0.0
 	for {
+		if _oldValue != 0.0 {
+			switch _interval {
+			case models.ThirtySeconds:
+				time.Sleep(time.Second * 30)
+				break
+			case models.AMinute:
+				time.Sleep(time.Minute)
+				break
+			case models.TenMinutes:
+				time.Sleep(time.Minute * 10)
+				break
+			default:
+			case models.TenSeconds:
+				time.Sleep(time.Second * 10)
+				break
+			}
+		}
+
 		resp, err := http.Get("https://freecurrencyapi.net/api/v2/latest?apikey=ae3e2a90-4cf6-11ec-baf0-fd76e1528414&base_currency=USD")
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Fatalln(err.Error())
 			continue
 		}
 
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Fatalln(err.Error())
 			continue
 		}
 
@@ -30,7 +48,7 @@ func helloClock() {
 		var currency models.Currency
 		err = json.Unmarshal([]byte(sb), &currency)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Fatalln(err.Error())
 			continue
 		}
 
@@ -39,27 +57,11 @@ func helloClock() {
 			Title: titleStr,
 		})
 
-		if oldValue > (currency.Data.TRY+0.5) || oldValue < (currency.Data.TRY-0.5) {
-			oldValue = currency.Data.TRY
+		if _oldValue > (currency.Data.TRY+0.5) || _oldValue < (currency.Data.TRY-0.5) {
+			_oldValue = currency.Data.TRY
 			menuet.App().Notification(menuet.Notification{
 				Title: fmt.Sprintf("Currency changed %f", currency.Data.TRY),
 			})
-		}
-
-		switch _interval {
-		case models.ThirtySeconds:
-			time.Sleep(time.Second * 30)
-			break
-		case models.AMinute:
-			time.Sleep(time.Minute)
-			break
-		case models.TenMinutes:
-			time.Sleep(time.Minute * 10)
-			break
-		default:
-		case models.TenSeconds:
-			time.Sleep(time.Second * 10)
-			break
 		}
 	}
 }
@@ -113,9 +115,10 @@ func menuItems() []menuet.MenuItem {
 }
 
 var _interval int
+var _oldValue int
 
 func main() {
-	go helloClock()
+	go getCurrenciesInfo()
 	menuet.App().Label = "com.github.safakkizkin.osx-currency-go"
 	menuet.App().Children = menuItems
 	menuet.App().RunApplication()
