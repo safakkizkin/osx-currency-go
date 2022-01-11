@@ -144,7 +144,7 @@ type Currency struct {
 		GBP float64 `json:"GBP"`
 		ETH float64 `json:"ETH"`
 		EUR float64 `json:"EUR"`
-		LTC int     `json:"LTC"`
+		LTC float64 `json:"LTC"`
 		NZD float64 `json:"NZD"`
 	} `json:"data"`
 }
