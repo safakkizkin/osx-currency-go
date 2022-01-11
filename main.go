@@ -13,23 +13,26 @@ import (
 
 func getCurrenciesInfo() {
 	_oldValue := 0.0
+	var intervalValue time.Duration
 	for {
 		if _oldValue != 0.0 {
 			switch _interval {
 			case models.ThirtySeconds:
-				time.Sleep(time.Second * 30)
+				intervalValue = time.Second * 30
 				break
 			case models.AMinute:
-				time.Sleep(time.Minute)
+				intervalValue = time.Minute
 				break
 			case models.TenMinutes:
-				time.Sleep(time.Minute * 10)
+				intervalValue = time.Minute * 10
 				break
 			default:
 			case models.TenSeconds:
-				time.Sleep(time.Second * 10)
+				intervalValue = time.Second * 10
 				break
 			}
+
+			time.Sleep(intervalValue)
 		}
 
 		resp, err := http.Get("https://freecurrencyapi.net/api/v2/latest?apikey=ae3e2a90-4cf6-11ec-baf0-fd76e1528414&base_currency=USD")
@@ -51,12 +54,10 @@ func getCurrenciesInfo() {
 			log.Fatalln(err.Error())
 			continue
 		}
-
 		titleStr := fmt.Sprintf("USD to TRY: %f", currency.Data.TRY)
 		menuet.App().SetMenuState(&menuet.MenuState{
 			Title: titleStr,
 		})
-
 		if _oldValue > (currency.Data.TRY+0.5) || _oldValue < (currency.Data.TRY-0.5) {
 			_oldValue = currency.Data.TRY
 			menuet.App().Notification(menuet.Notification{
@@ -107,10 +108,6 @@ func menuItems() []menuet.MenuItem {
 			Text:     "Interval",
 			Children: getIntervals,
 		},
-		//menuet.MenuItem{
-		//	Text:     "Currency",
-		//	Children: currencies,
-		//},
 	}
 }
 
